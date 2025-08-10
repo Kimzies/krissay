@@ -1,58 +1,108 @@
-<!DOCTYPE html><html><head><title>Krissay</title></head><body><h1>Hello from Krissay</h1></body></html>
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Krissay</title>
+  <title>Krissay - Flower Effect</title>
   <style>
     body {
       margin: 0;
       height: 100vh;
+      background: linear-gradient(135deg, #ffdde1, #ee9ca7);
       display: flex;
       justify-content: center;
       align-items: center;
-      background: #0f2027; /* fallback cho màu tối */
-      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-      color: white;
       font-family: Arial, sans-serif;
       overflow: hidden;
+      color: white;
     }
-
     h1 {
+      position: relative;
+      z-index: 1;
       font-size: 3rem;
-      color: #fff;
-      text-shadow:
-        0 0 5px rgba(255, 255, 255, 0.8),
-        0 0 10px rgba(255, 255, 255, 0.6),
-        0 0 20px rgba(0, 200, 255, 0.8),
-        0 0 40px rgba(0, 200, 255, 0.6),
-        0 0 80px rgba(0, 200, 255, 0.4);
-      animation: glow 2s ease-in-out infinite alternate;
+      text-shadow: 0 0 5px rgba(255,255,255,0.8);
     }
-
-    @keyframes glow {
-      from {
-        text-shadow:
-          0 0 5px rgba(255, 255, 255, 0.8),
-          0 0 10px rgba(255, 255, 255, 0.6),
-          0 0 20px rgba(0, 200, 255, 0.8),
-          0 0 40px rgba(0, 200, 255, 0.6),
-          0 0 80px rgba(0, 200, 255, 0.4);
-      }
-      to {
-        text-shadow:
-          0 0 10px rgba(255, 255, 255, 1),
-          0 0 20px rgba(255, 255, 255, 0.8),
-          0 0 30px rgba(0, 200, 255, 1),
-          0 0 60px rgba(0, 200, 255, 0.8),
-          0 0 100px rgba(0, 200, 255, 0.6);
-      }
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
     }
   </style>
 </head>
 <body>
+  <canvas id="flowerCanvas"></canvas>
   <h1>Hello from Krissay</h1>
+
+  <script>
+    const canvas = document.getElementById('flowerCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+    canvas.width = width;
+    canvas.height = height;
+
+    const petals = [];
+    const petalCount = 25;
+    const petalImage = new Image();
+    petalImage.src = 'https://i.imgur.com/5xvYb2Z.png'; // PNG cánh hoa hồng nhỏ
+
+    class Petal {
+      constructor() {
+        this.reset();
+      }
+      reset() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * -height;
+        this.size = 20 + Math.random() * 20;
+        this.speedY = 1 + Math.random() * 2;
+        this.speedX = Math.random() * 1 - 0.5;
+        this.rotation = Math.random() * 360;
+        this.rotationSpeed = Math.random() * 2 - 1;
+      }
+      update() {
+        this.y += this.speedY;
+        this.x += this.speedX;
+        this.rotation += this.rotationSpeed;
+        if (this.y > height) {
+          this.reset();
+        }
+      }
+      draw() {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.rotation * Math.PI / 180);
+        ctx.drawImage(petalImage, -this.size/2, -this.size/2, this.size, this.size);
+        ctx.restore();
+      }
+    }
+
+    function init() {
+      for (let i = 0; i < petalCount; i++) {
+        petals.push(new Petal());
+      }
+      animate();
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, width, height);
+      petals.forEach(petal => {
+        petal.update();
+        petal.draw();
+      });
+      requestAnimationFrame(animate);
+    }
+
+    petalImage.onload = init;
+
+    window.addEventListener('resize', () => {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width;
+      canvas.height = height;
+    });
+  </script>
 </body>
 </html>
-
+     
